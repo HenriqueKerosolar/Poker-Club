@@ -13,7 +13,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@mui/base": "^5.0.0",
     "@mui/icons-material": "^5.14.0",
     "@mui/material": "^5.14.0",
     "@mui/system": "^5.14.0",
