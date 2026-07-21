@@ -1,52 +1,58 @@
-# Multi-stage build para monorepo pnpm
-FROM node:20-alpine AS builder
+# Stage 1: Dependencies and Build
+FROM node:20-slim as builder
 
 WORKDIR /app
 
 # Install pnpm
-RUN npm install -g pnpm
+RUN npm install -g pnpm@8
 
-# Copy workspace files
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+# Copy root package files
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 
-# Copy all packages
-COPY packages ./packages
+# Copy backend package
+COPY packages/backend ./packages/backend
+COPY packages/shared ./packages/shared
 
-# Install all dependencies
+# Install dependencies
 RUN pnpm install --frozen-lockfile
 
 # Build backend
-RUN pnpm --filter backend run build
+WORKDIR /app/packages/backend
+RUN pnpm build
 
-# Production stage
-FROM node:20-alpine
+# Stage 2: Runtime
+FROM node:20-slim
 
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install pnpm for running
+RUN npm install -g pnpm@8
 
-# Copy workspace files
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+# Copy package files
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 
-# Copy packages
-COPY packages ./packages
+# Copy only backend
+COPY packages/backend ./packages/backend
+COPY packages/shared ./packages/shared
 
 # Install production dependencies only
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile --prod && pnpm prune --prod
 
-# Copy built backend from builder
+# Copy built dist
 COPY --from=builder /app/packages/backend/dist ./packages/backend/dist
 
-# Set working directory to backend
+# Set environment
+ENV NODE_ENV=production
+ENV PORT=3012
+
 WORKDIR /app/packages/backend
 
-# Expose port 3012 (backend port)
-EXPOSE 3012
-
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3012/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
 
-# Start backend
+# Expose port
+EXPOSE 3012
+
+# Run backend
 CMD ["node", "dist/main.js"]
