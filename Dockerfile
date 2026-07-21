@@ -14,7 +14,7 @@ COPY packages/backend ./packages/backend
 COPY packages/shared ./packages/shared
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 # Build backend
 WORKDIR /app/packages/backend
@@ -36,7 +36,7 @@ COPY packages/backend ./packages/backend
 COPY packages/shared ./packages/shared
 
 # Install production dependencies only
-RUN pnpm install --frozen-lockfile --prod && pnpm prune --prod
+RUN pnpm install --prod && pnpm prune --prod
 
 # Copy built dist
 COPY --from=builder /app/packages/backend/dist ./packages/backend/dist
