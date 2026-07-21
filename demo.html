@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker Club MVP - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom right, #111827, #1f2937);
+            color: #e5e7eb;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: #1f2937;
+            border-bottom: 1px solid #374151;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fbbf24;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .welcome {
+            margin-bottom: 2rem;
+        }
+
+        .welcome h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: #fbbf24;
+        }
+
+        .welcome p {
+            color: #9ca3af;
+            font-size: 1.1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #1f2937, #111827);
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px rgba(251, 191, 36, 0.1);
+            border-color: #fbbf24;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #fbbf24;
+        }
+
+        .wallet-summary {
+            background: linear-gradient(135deg, #1f2937, #1a202c);
+            border: 2px solid #fbbf24;
+        }
+
+        .balance-main {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fbbf24;
+            margin-bottom: 1rem;
+        }
+
+        .balance-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #374151;
+            font-size: 0.95rem;
+        }
+
+        .balance-item:last-child {
+            border-bottom: none;
+        }
+
+        .balance-label {
+            color: #9ca3af;
+        }
+
+        .balance-value {
+            font-weight: 600;
+            color: #d1d5db;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .game-card {
+            background: linear-gradient(135deg, #374151, #1f2937);
+            border: 1px solid #4b5563;
+            padding: 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .game-card:hover {
+            border-color: #fbbf24;
+            box-shadow: 0 10px 20px rgba(251, 191, 36, 0.15);
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .game-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .game-status {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .game-status.waiting {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+        }
+
+        .game-players {
+            color: #9ca3af;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .game-info-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem;
+            border-radius: 6px;
+        }
+
+        .trophy-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .trophy {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            background: rgba(251, 191, 36, 0.1);
+            border: 2px solid #fbbf24;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .trophy:hover {
+            transform: scale(1.1);
+        }
+
+        .leaderboard {
+            background: linear-gradient(135deg, #1f2937, #111827);
+            border: 1px solid #374151;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .leaderboard-title {
+            padding: 1.5rem;
+            border-bottom: 1px solid #374151;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fbbf24;
+        }
+
+        .player-row {
+            display: grid;
+            grid-template-columns: 40px 1fr 120px 100px;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #374151;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .player-row:hover {
+            background: rgba(251, 191, 36, 0.05);
+        }
+
+        .player-rank {
+            font-weight: bold;
+            color: #fbbf24;
+            font-size: 1.1rem;
+        }
+
+        .player-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-name {
+            font-weight: 600;
+            color: #f3f4f6;
+        }
+
+        .player-wins {
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .player-rate {
+            font-weight: 600;
+            color: #10b981;
+            text-align: center;
+        }
+
+        .rank-position {
+            text-align: right;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #6366f1;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 2rem 0 1rem 0;
+            color: #f3f4f6;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #374151, #1f2937);
+            border: 1px solid #4b5563;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fbbf24;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+            border-top: 1px solid #374151;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .welcome h1 {
+                font-size: 1.8rem;
+            }
+
+            .player-row {
+                grid-template-columns: 30px 1fr 80px;
+                gap: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .rank-position {
+                display: none;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="navbar-brand">🎰 Poker Club</div>
+        <div class="navbar-user">
+            <span>Bem-vindo, alice_player!</span>
+            <div class="user-avatar">AP</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Welcome Section -->
+        <div class="welcome">
+            <h1>Bem-vindo de volta! 🎮</h1>
+            <p>Pronto para jogar? Escolha uma sala ou crie um novo jogo.</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-value">152</div>
+                <div class="stat-label">Partidas Jogadas</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">75%</div>
+                <div class="stat-label">Taxa de Vitória</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">R$ 1.250</div>
+                <div class="stat-label">Total Ganho</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">#1</div>
+                <div class="stat-label">Ranking Global</div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid">
+            <!-- Wallet Card -->
+            <div class="card wallet-summary">
+                <div class="card-title">💰 Carteira</div>
+                <div class="balance-main">R$ 512,50</div>
+                <div class="balance-item">
+                    <span class="balance-label">Saldo Disponível</span>
+                    <span class="balance-value">R$ 287,50</span>
+                </div>
+                <div class="balance-item">
+                    <span class="balance-label">Estoque</span>
+                    <span class="balance-value">R$ 150,00</span>
+                </div>
+                <div class="balance-item">
+                    <span class="balance-label">Reservado (em jogo)</span>
+                    <span class="balance-value">R$ 75,00</span>
+                </div>
+                <button class="button">Jogar Agora</button>
+            </div>
+
+            <!-- Leaderboard Preview -->
+            <div class="card">
+                <div class="card-title">🏆 Top Players</div>
+                <div style="font-size: 2rem; text-align: center; color: #fbbf24; margin-bottom: 1rem;">#1</div>
+                <div class="balance-item">
+                    <span class="balance-label">Ranking</span>
+                    <span class="balance-value">1º lugar</span>
+                </div>
+                <div class="balance-item">
+                    <span class="balance-label">Win Rate</span>
+                    <span class="balance-value">75.2%</span>
+                </div>
+                <div class="balance-item">
+                    <span class="balance-label">Ganhos</span>
+                    <span class="balance-value">R$ 1.250</span>
+                </div>
+                <button class="button">Ver Leaderboard Completo</button>
+            </div>
+
+            <!-- Trophies -->
+            <div class="card">
+                <div class="card-title">🏅 Seus Troféus (8)</div>
+                <div class="trophy-grid">
+                    <div class="trophy" title="First Hand">🎰</div>
+                    <div class="trophy" title="Vencedor">🏆</div>
+                    <div class="trophy" title="10 Vitórias">⭐</div>
+                    <div class="trophy" title="50 Vitórias">✨</div>
+                    <div class="trophy" title="Estrategista">📊</div>
+                    <div class="trophy" title="High Roller">💰</div>
+                    <div class="trophy" title="Maremoto">🌊</div>
+                    <div class="trophy" title="Retorno">⚡</div>
+                </div>
+                <button class="button">Ver Progresso de Troféus</button>
+            </div>
+        </div>
+
+        <!-- Active Games Section -->
+        <div class="section-title">🎮 Jogos Ativos</div>
+        <div class="grid">
+            <!-- Game 1 -->
+            <div class="game-card">
+                <div class="game-header">
+                    <div class="game-name">Texas Hold'em</div>
+                    <div class="game-status">RUNNING</div>
+                </div>
+                <div class="game-players">🎴 3 jogadores</div>
+                <div class="game-info">
+                    <div class="game-info-item">
+                        <strong>Buy-in:</strong> R$ 50,00
+                    </div>
+                    <div class="game-info-item">
+                        <strong>Pote:</strong> R$ 450,00
+                    </div>
+                </div>
+                <button class="button">Entrar Jogo</button>
+            </div>
+
+            <!-- Game 2 -->
+            <div class="game-card">
+                <div class="game-header">
+                    <div class="game-name">Omaha Hi-Lo</div>
+                    <div class="game-status waiting">WAITING</div>
+                </div>
+                <div class="game-players">🎴 5 de 8 jogadores</div>
+                <div class="game-info">
+                    <div class="game-info-item">
+                        <strong>Buy-in:</strong> R$ 100,00
+                    </div>
+                    <div class="game-info-item">
+                        <strong>Players:</strong> 5/8
+                    </div>
+                </div>
+                <button class="button">Entrar Jogo</button>
+            </div>
+
+            <!-- Game 3 -->
+            <div class="game-card">
+                <div class="game-header">
+                    <div class="game-name">7-Card Stud</div>
+                    <div class="game-status">RUNNING</div>
+                </div>
+                <div class="game-players">🎴 4 jogadores</div>
+                <div class="game-info">
+                    <div class="game-info-item">
+                        <strong>Buy-in:</strong> R$ 75,00
+                    </div>
+                    <div class="game-info-item">
+                        <strong>Pote:</strong> R$ 600,00
+                    </div>
+                </div>
+                <button class="button">Entrar Jogo</button>
+            </div>
+        </div>
+
+        <!-- Leaderboard Section -->
+        <div class="section-title">🏅 Leaderboard Global</div>
+        <div class="leaderboard">
+            <div class="leaderboard-title">Top 5 Players</div>
+            <div class="player-row">
+                <div class="player-rank">1</div>
+                <div class="player-info">
+                    <span class="player-name">alice_player (Você) 👑</span>
+                    <span class="player-wins">152 vitórias</span>
+                </div>
+                <div class="player-rate">75.2%</div>
+                <div class="rank-position">1º</div>
+            </div>
+            <div class="player-row">
+                <div class="player-rank">2</div>
+                <div class="player-info">
+                    <span class="player-name">bob_poker</span>
+                    <span class="player-wins">89 vitórias</span>
+                </div>
+                <div class="player-rate">62.8%</div>
+                <div class="rank-position">2º</div>
+            </div>
+            <div class="player-row">
+                <div class="player-rank">3</div>
+                <div class="player-info">
+                    <span class="player-name">charlie_king</span>
+                    <span class="player-wins">67 vitórias</span>
+                </div>
+                <div class="player-rate">58.5%</div>
+                <div class="rank-position">3º</div>
+            </div>
+            <div class="player-row">
+                <div class="player-rank">4</div>
+                <div class="player-info">
+                    <span class="player-name">diana_fortune</span>
+                    <span class="player-wins">54 vitórias</span>
+                </div>
+                <div class="player-rate">55.2%</div>
+                <div class="rank-position">4º</div>
+            </div>
+            <div class="player-row">
+                <div class="player-rank">5</div>
+                <div class="player-info">
+                    <span class="player-name">eve_sharp</span>
+                    <span class="player-wins">45 vitórias</span>
+                </div>
+                <div class="player-rate">52.1%</div>
+                <div class="rank-position">5º</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>🎰 Poker Club MVP - Desenvolvido com Next.js, NestJS e Kubernetes</p>
+            <p style="margin-top: 1rem; font-size: 0.85rem;">Todas as moedas são virtuais e recreativas</p>
+        </footer>
+    </div>
+</body>
+</html>

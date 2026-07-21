@@ -1,0 +1,89 @@
+🎰 POKER CLUB MVP - COMECE AQUI!
+════════════════════════════════════
+
+TEMPO TOTAL: ~15 minutos para rodar tudo
+
+════════════════════════════════════
+🚀 FORMA MAIS FÁCIL (1 comando)
+════════════════════════════════════
+
+1. Abra PowerShell neste diretório (C:\Projetos\Poker)
+
+2. Execute este comando:
+   .\setup.ps1
+
+3. Pronto! Tudo será instalado e configurado automaticamente.
+
+
+════════════════════════════════════
+⚡ FORMA RÁPIDA (Se setup não funcionar)
+════════════════════════════════════
+
+TERMINAL 1 - Docker:
+  cd C:\Projetos\Poker
+  docker-compose up -d
+
+TERMINAL 2 - Backend:
+  cd C:\Projetos\Poker\packages\backend
+  npm install
+  npx prisma migrate dev
+  npm run dev
+
+TERMINAL 3 - Frontend:
+  cd C:\Projetos\Poker\packages\web
+  npm install
+  npm run dev
+
+Depois abra: http://localhost:3002
+
+
+════════════════════════════════════
+🎯 VERIFICAÇÃO
+════════════════════════════════════
+
+✅ Backend rodando em: http://localhost:3011
+✅ Frontend rodando em: http://localhost:3002
+✅ Banco de dados: PostgreSQL (localhost:5432)
+✅ Cache: Redis (localhost:6379)
+
+
+════════════════════════════════════
+📁 ARQUIVOS IMPORTANTES
+════════════════════════════════════
+
+✓ setup.ps1             → Script de setup automático
+✓ run-backend.bat       → Rodar backend rapidinho
+✓ run-frontend.bat      → Rodar frontend rapidinho
+✓ start-docker.bat      → Iniciar Docker rapidinho
+✓ QUICK_START.md        → Instruções detalhadas
+✓ docker-compose.yml    → Configuração do banco
+✓ packages/backend/.env → Variáveis backend
+✓ packages/web/.env.local → Variáveis frontend
+
+
+════════════════════════════════════
+🔧 TROUBLESHOOTING
+════════════════════════════════════
+
+Se falhar em setup.ps1:
+  Abra PowerShell como ADMINISTRADOR e tente novamente
+
+Se porta já está em uso:
+  netstat -ano | findstr :3002
+  taskkill /PID [número] /F
+
+Se banco não conecta:
+  docker ps
+  docker-compose down
+  docker-compose up -d
+
+
+════════════════════════════════════
+✨ FICOU FÁCIL!
+════════════════════════════════════
+
+Próximo passo: Execute .\setup.ps1
+
+E divirta-se com o Poker Club MVP! 🎮🎰
+
+════════════════════════════════════

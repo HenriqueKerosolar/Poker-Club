@@ -1,0 +1,636 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===========================
+// AUTENTICAÇÃO & USUÁRIOS
+// ===========================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  phone         String?   @unique
+  displayName   String?
+  avatar        String?
+  provider      String    @default("email") // email, google, apple
+  authProvider  String    @default("email") // email, google, apple
+  password      String?
+  passwordHash  String?
+  googleId      String?   @unique
+  appleId       String?   @unique
+  emailVerified DateTime?
+  phoneVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  profile       UserProfile?
+  avatar        Avatar?
+  wallet        VirtualWallet?
+  sessions      DeviceSession[]
+
+  // Social
+  sentFriendships    Friendship[] @relation("UserA")
+  receivedFriendships Friendship[] @relation("UserB")
+  blockedBy     Block[]   @relation("Blocker")
+  blocking      Block[]   @relation("Blocked")
+
+  // Games
+  createdGames  Game[]    @relation("Creator")
+  gameAsPlayer  GamePlayer[]
+
+  // Tournaments
+  createdTournaments Tournament[] @relation("Creator")
+  tournamentParticipants TournamentParticipant[]
+
+  // Clubs
+  ownedClubs    Club[]    @relation("Owner")
+  adminClubs    Club[]    @relation("Admin")
+  clubMembers   ClubMember[]
+
+  // Moderation
+  sentReports   Report[]  @relation("Reporter")
+  receivedReports Report[] @relation("Reported")
+  moderationActions ModerationAction[] @relation("Admin")
+  auditLogs     AuditLog[] @relation("Admin")
+
+  // Social activity
+  chatMessages  ChatMessage[]
+  trophies      UserTrophy[]
+  achievements  UserAchievement[]
+  notifications Notification[]
+  walletTransactions VirtualWalletTransaction[]
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+model UserProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  username        String    @unique
+  displayName     String
+  country         String?
+  language        String    @default("pt-BR")
+  bio             String?
+
+  level           Int       @default(1)
+  experience      Int       @default(0)
+  totalGames      Int       @default(0)
+  wins            Int       @default(0)
+  losses          Int       @default(0)
+  draws           Int       @default(0)
+
+  favoriteVariant String?   // poker variant ID
+  preferredScenario String?  // scenario ID
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([username])
+  @@index([userId])
+}
+
+model Avatar {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  imageUrl      String
+  style         String    // realistic, casino_classic, executive, cartoon, etc
+  isPublic      Boolean   @default(true)
+  onlyForFriends Boolean  @default(false)
+
+  accessories   String?   // JSON: array of accessory IDs
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+// ===========================
+// SOCIAL
+// ===========================
+
+model Friendship {
+  id        String    @id @default(cuid())
+  userAId   String
+  userA     User      @relation("UserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userBId   String
+  userB     User      @relation("UserB", fields: [userBId], references: [id], onDelete: Cascade)
+
+  status    String    @default("pending") // pending, accepted, blocked
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userAId, userBId])
+  @@index([userAId])
+  @@index([userBId])
+}
+
+model Block {
+  id        String    @id @default(cuid())
+  blockerId String
+  blocker   User      @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockedId String
+  blocked   User      @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  reason    String?
+  createdAt DateTime  @default(now())
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+  @@index([blockedId])
+}
+
+model Club {
+  id          String    @id @default(cuid())
+  ownerId     String
+  owner       User      @relation("Owner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  name        String
+  logoUrl     String?
+  description String?
+  isPublic    Boolean   @default(false)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  members     ClubMember[]
+  admins      User[]    @relation("Admin")
+
+  @@index([ownerId])
+  @@index([name])
+}
+
+model ClubMember {
+  id        String    @id @default(cuid())
+  clubId    String
+  club      Club      @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role      String    @default("member") // owner, admin, member
+  joinedAt  DateTime  @default(now())
+
+  @@unique([clubId, userId])
+  @@index([clubId])
+  @@index([userId])
+}
+
+model ChatMessage {
+  id        String    @id @default(cuid())
+  gameId    String?   // null se mensagem de club/amigo
+  game      Game?     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  senderId  String
+  sender    User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  content   String    @db.VarChar(200)
+  emoji     String?   // 👍 😂 🎉
+
+  createdAt DateTime  @default(now())
+
+  @@index([gameId])
+  @@index([senderId])
+}
+
+// ===========================
+// CARTEIRA VIRTUAL
+// ===========================
+
+model VirtualWallet {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Saldos em centavos
+  balanceCents    BigInt    @default(10000) // R$ 100,00 = 10000 cents
+  stockCents      BigInt    @default(0)     // Estoque guardado
+  reservedCents   BigInt    @default(0)     // Bloqueado/em jogo
+
+  lastRecoveryCredit DateTime?
+  nextRecoveryEligible DateTime?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  transactions    VirtualWalletTransaction[]
+
+  @@index([userId])
+}
+
+model VirtualWalletTransaction {
+  id              String    @id @default(cuid())
+  walletId        String
+  wallet          VirtualWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type            String    // credit_initial, recovery, game_entry, game_result, buyin, gift, loan, etc
+  description     String
+  amountCents     BigInt    // positivo = crédito, negativo = débito
+  balanceBeforeCents BigInt
+  balanceAfterCents  BigInt
+
+  gameId          String?
+  tournamentId    String?
+  referenceId     String?   // para rastrear transfers
+
+  createdAt       DateTime  @default(now())
+
+  @@index([walletId])
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model ConversionRate {
+  id              String    @id @default(cuid())
+  rateCentsPerChip BigInt   // R$ 0,01 = 1 chip
+  effectiveDate   DateTime
+  deprecated      Boolean   @default(false)
+
+  @@index([effectiveDate])
+}
+
+// ===========================
+// JOGOS & POKER
+// ===========================
+
+model Game {
+  id              String    @id @default(cuid())
+  variantId       String    // variant identifier
+
+  createdById     String
+  createdBy       User      @relation("Creator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  status          String    @default("waiting") // waiting, ready, in_progress, completed, cancelled
+
+  buyInCents      BigInt    // buy-in required
+  scenario        String?   // casino_classic, vegas_night, etc
+  music           String?   // ambient music track
+  useFacilitator  Boolean   @default(false)
+
+  createdAt       DateTime  @default(now())
+  startedAt       DateTime?
+  endedAt         DateTime?
+
+  players         GamePlayer[]
+  hands           GameHand[]
+  results         GameResult[]
+  chatMessages    ChatMessage[]
+
+  @@index([createdById])
+  @@index([status])
+  @@index([variantId])
+  @@index([createdAt])
+}
+
+model GamePlayer {
+  id              String    @id @default(cuid())
+  gameId          String
+  game            Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  position        Int       // 0 = dealer/button, 1 = sb, 2 = bb
+
+  initialBalanceCents BigInt
+  finalBalanceCents   BigInt?
+  resultCents         BigInt? // positivo = ganho, negativo = perda
+
+  status          String    @default("active") // active, folded, disconnected, left, all_in
+
+  joinedAt        DateTime  @default(now())
+  leftAt          DateTime?
+
+  actions         GameAction[]
+  results         GameResult[] @relation("Winner")
+
+  @@unique([gameId, userId])
+  @@index([gameId])
+  @@index([userId])
+}
+
+model GameHand {
+  id              String    @id @default(cuid())
+  gameId          String
+  game            Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  handNumber      Int
+  status          String    @default("in_progress") // in_progress, showdown, completed
+
+  dealerButtonPosition Int
+  sbAmountCents   BigInt
+  bbAmountCents   BigInt
+
+  deck            String?   // JSON serialized (encrypted in production)
+  communityCards  String?   // JSON: [card, card, ...]
+
+  createdAt       DateTime  @default(now())
+  completedAt     DateTime?
+
+  actions         GameAction[]
+  pots            GamePot[]
+
+  @@unique([gameId, handNumber])
+  @@index([gameId])
+}
+
+model GameAction {
+  id              String    @id @default(cuid())
+  handId          String
+  hand            GameHand  @relation(fields: [handId], references: [id], onDelete: Cascade)
+
+  playerId        String
+  player          GamePlayer @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  action          String    // fold, check, call, bet, raise, allin
+  amountCents     BigInt    @default(0)
+
+  sequence        Int       // ordem de ação nesta mão
+
+  createdAt       DateTime  @default(now())
+
+  @@unique([handId, sequence])
+  @@index([handId])
+  @@index([playerId])
+}
+
+model GamePot {
+  id              String    @id @default(cuid())
+  handId          String
+  hand            GameHand  @relation(fields: [handId], references: [id], onDelete: Cascade)
+
+  type            String    @default("main") // main, sidepot_1, sidepot_2, etc
+  amountCents     BigInt
+
+  eligiblePlayerIds String // JSON: array of player IDs eligible for this pot
+
+  createdAt       DateTime  @default(now())
+
+  @@index([handId])
+}
+
+model GameResult {
+  id              String    @id @default(cuid())
+  gameId          String
+  game            Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  winnerId        String
+  winner          GamePlayer @relation("Winner", fields: [winnerId], references: [id], onDelete: Cascade)
+
+  prizeAmountCents BigInt
+  bestHand       String?   // Royal Flush, Flush, etc
+
+  createdAt       DateTime  @default(now())
+
+  @@index([gameId])
+  @@index([winnerId])
+}
+
+// ===========================
+// CAMPEONATOS
+// ===========================
+
+model Tournament {
+  id              String    @id @default(cuid())
+  creatorId       String
+  creator         User      @relation("Creator", fields: [creatorId], references: [id], onDelete: SetNull)
+
+  name            String
+  description     String?
+  variantId       String
+
+  status          String    @default("registration") // registration, in_progress, completed, cancelled
+  format          String    // quick, best_of_3, best_of_5, elimination, points
+
+  maxParticipants Int
+  buyInCents      BigInt
+
+  createdAt       DateTime  @default(now())
+  startedAt       DateTime?
+  endedAt         DateTime?
+
+  participants    TournamentParticipant[]
+  results         TournamentResult[]
+
+  @@index([creatorId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model TournamentParticipant {
+  id              String    @id @default(cuid())
+  tournamentId    String
+  tournament      Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status          String    @default("active") // active, eliminated
+  buyInCents      BigInt
+
+  joinedAt        DateTime  @default(now())
+  eliminatedAt    DateTime?
+
+  @@unique([tournamentId, userId])
+  @@index([tournamentId])
+  @@index([userId])
+}
+
+model TournamentResult {
+  id              String    @id @default(cuid())
+  tournamentId    String
+  tournament      Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+
+  rank            Int
+  userId          String
+
+  priceCents      BigInt
+  trophyId        String?
+
+  createdAt       DateTime  @default(now())
+
+  @@unique([tournamentId, rank])
+  @@index([tournamentId])
+  @@index([userId])
+}
+
+// ===========================
+// TROFÉUS & CONQUISTAS
+// ===========================
+
+model Trophy {
+  id              String    @id @default(cuid())
+  name            String    @unique
+  description     String?
+  material        String    // bronze, silver, gold, platinum, diamond, crystal, special
+  iconUrl         String?
+  rarity          String    // common, rare, epic, legendary
+
+  createdAt       DateTime  @default(now())
+
+  userTrophies    UserTrophy[]
+
+  @@index([material])
+  @@index([rarity])
+}
+
+model UserTrophy {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  trophyId        String
+  trophy          Trophy    @relation(fields: [trophyId], references: [id], onDelete: Cascade)
+
+  tournamentId    String?
+  details         String?   // JSON: meta info sobre quando conquistado
+
+  earnedAt        DateTime  @default(now())
+
+  @@unique([userId, trophyId, tournamentId])
+  @@index([userId])
+  @@index([trophyId])
+}
+
+model Achievement {
+  id              String    @id @default(cuid())
+  name            String    @unique
+  description     String?
+  iconUrl         String?
+
+  createdAt       DateTime  @default(now())
+
+  userAchievements UserAchievement[]
+
+  @@index([name])
+}
+
+model UserAchievement {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  achievementId   String
+  achievement     Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  unlockedAt      DateTime  @default(now())
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@index([achievementId])
+}
+
+// ===========================
+// MODERAÇÃO
+// ===========================
+
+model Report {
+  id              String    @id @default(cuid())
+  reporterId      String
+  reporter        User      @relation("Reporter", fields: [reporterId], references: [id], onDelete: SetNull)
+
+  reportedId      String
+  reported        User      @relation("Reported", fields: [reportedId], references: [id], onDelete: SetNull)
+
+  reason          String
+  details         String?
+
+  status          String    @default("open") // open, investigating, resolved, dismissed
+
+  createdAt       DateTime  @default(now())
+  resolvedAt      DateTime?
+
+  @@index([reporterId])
+  @@index([reportedId])
+  @@index([status])
+}
+
+model ModerationAction {
+  id              String    @id @default(cuid())
+  adminId         String
+  admin           User      @relation("Admin", fields: [adminId], references: [id], onDelete: SetNull)
+
+  targetUserId    String
+  action          String    // suspend, warn, remove_avatar, block_chat, etc
+  reason          String
+
+  durationDays    Int?
+
+  createdAt       DateTime  @default(now())
+
+  @@index([adminId])
+  @@index([targetUserId])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id              String    @id @default(cuid())
+  adminId         String
+  admin           User      @relation("Admin", fields: [adminId], references: [id], onDelete: SetNull)
+
+  action          String
+  entityType      String    // User, Game, Tournament, Wallet, etc
+  entityId        String
+
+  changes         String?   // JSON
+
+  createdAt       DateTime  @default(now())
+
+  @@index([adminId])
+  @@index([entityType])
+  @@index([createdAt])
+}
+
+// ===========================
+// SEGURANÇA & SESSÕES
+// ===========================
+
+model DeviceSession {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  deviceId        String
+  userAgent       String?
+  ipAddress       String?
+
+  lastSeenAt      DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+
+  @@unique([userId, deviceId])
+  @@index([userId])
+}
+
+model Notification {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type            String    // invitation, friend_request, game_started, turn_alert, etc
+  title           String
+  body            String
+
+  read            Boolean   @default(false)
+  readAt          DateTime?
+
+  relatedId       String?   // gameId, userId, etc
+
+  createdAt       DateTime  @default(now())
+
+  @@index([userId])
+  @@index([read])
+  @@index([type])
+}

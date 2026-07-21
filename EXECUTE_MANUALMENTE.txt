@@ -1,0 +1,57 @@
+🎰 POKER CLUB MVP - EXECUTE MANUALMENTE
+════════════════════════════════════════════
+
+Desculpe! As dependências npm não instalaram corretamente.
+Execute estes comandos MANUALMENTE no PowerShell:
+
+════════════════════════════════════════════
+TERMINAL 1 - BACKEND
+════════════════════════════════════════════
+
+cd C:\Projetos\Poker\packages\backend
+npm install --force
+npm run dev
+
+Aguarde ver:
+  [Nest] ... LOG [NestFactory] Starting Nest application...
+  [Nest] ... LOG Server running on http://localhost:3011
+
+════════════════════════════════════════════
+TERMINAL 2 - FRONTEND
+════════════════════════════════════════════
+
+cd C:\Projetos\Poker\packages\web
+npm install --force
+npm run dev
+
+Aguarde ver:
+  ▲ Next.js 16.0.0
+  - Local:        http://localhost:3002
+  - Ready in X.Xs
+
+════════════════════════════════════════════
+TERMINAL 3 - NAVEGADOR
+════════════════════════════════════════════
+
+Depois que ambos disserem "ready" ou "running", abra:
+
+  http://localhost:3002
+
+════════════════════════════════════════════
+SE ALGO DER ERRO:
+════════════════════════════════════════════
+
+1. Backend diz "cannot find module":
+   npm install --force --legacy-peer-deps
+   npm run dev
+
+2. Frontend diz "cannot find module":
+   npm install --force
+   npm run dev
+
+3. Porta já em uso:
+   Feche o navegador ou outro programa na porta 3002/3011
+
+════════════════════════════════════════════
+VOCÊ ESTÁ AQUI ➜ [PRÓXIMO PASSO: Execute acima]
+════════════════════════════════════════════
