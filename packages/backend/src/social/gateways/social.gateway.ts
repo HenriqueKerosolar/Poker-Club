@@ -1,4 +1,4 @@
-import {
+﻿import {
   WebSocketGateway,
   WebSocketServer,
   SubscribeMessage,
@@ -7,10 +7,10 @@ import {
   ConnectedSocket,
   MessageBody,
   UseFilters,
-  Logger,
 } from '@nestjs/websockets';
+import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { AuthService } from '@/auth/auth.service';
+import { AuthService } from '../../auth/auth.service';
 import { FriendsService } from '../services/friends.service';
 import { ChatService } from '../services/chat.service';
 

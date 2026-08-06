@@ -1,5 +1,5 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '@/database/prisma.service';
+﻿import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { PrismaService } from '../../database/prisma.service';
 
 /**
  * PixService - Integração com Pix (pagamentos virtuais)

@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Card, Hand } from '@shared/types/poker';
+﻿import { Injectable, Logger } from '@nestjs/common';
+import { Card, Hand } from '../../shared/types/poker';
 
 /**
  * RazzEngine - Razz (A-5 Lowball)

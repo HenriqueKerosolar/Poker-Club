@@ -21,13 +21,11 @@ async function bootstrap() {
 
   // CORS
   app.enableCors({
-    origin: process.env.NODE_ENV === 'production'
-      ? ['https://pokerclub.app']
-      : ['http://localhost:3001', 'http://localhost:3002', 'http://localhost:8081'],
+    origin: true,
     credentials: true,
   });
 
-  const port = process.env.BACKEND_PORT || 3000;
+  const port = process.env.PORT || process.env.BACKEND_PORT || 3012;
   await app.listen(port, '0.0.0.0');
 
   const logger = new Logger('Bootstrap');

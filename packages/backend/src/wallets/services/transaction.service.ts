@@ -1,6 +1,6 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '@/database/prisma.service';
-import { TransactionType } from '@shared/types/wallet';
+﻿import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { PrismaService } from '../../database/prisma.service';
+import { TransactionType } from '../../shared/types/wallet';
 import { WalletService } from './wallet.service';
 
 /**

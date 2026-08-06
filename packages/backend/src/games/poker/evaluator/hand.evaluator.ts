@@ -1,4 +1,4 @@
-import { Card, Hand, HandRank, Rank, Suit } from '@shared/types/poker';
+﻿import { Card, Hand, HandRank, Rank, Suit } from '../../../shared/types/poker';
 import { DeckEngine } from '../engine/deck.engine';
 
 /**

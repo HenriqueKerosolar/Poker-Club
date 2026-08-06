@@ -6,8 +6,13 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   private logger = new Logger('PrismaService');
 
   async onModuleInit() {
-    await this.$connect();
-    this.logger.log('✅ Conectado ao banco de dados PostgreSQL');
+    try {
+      await this.$connect();
+      this.logger.log('✅ Conectado ao banco de dados PostgreSQL');
+    } catch (error) {
+      this.logger.warn(`⚠️ Banco de dados indisponível: ${error.message}`);
+      this.logger.warn('Servidor iniciando sem conexão com o banco — configure DATABASE_URL');
+    }
   }
 
   async onModuleDestroy() {

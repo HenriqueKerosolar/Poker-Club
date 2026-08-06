@@ -1,5 +1,5 @@
-import { describe, it, expect } from '@jest/globals';
-import { Rank, Suit } from '@shared/types/poker';
+﻿import { describe, it, expect } from '@jest/globals';
+import { Rank, Suit } from '../../../shared/types/poker';
 import { DeckEngine } from './deck.engine';
 
 describe('DeckEngine', () => {

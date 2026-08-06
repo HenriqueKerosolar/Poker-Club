@@ -1,11 +1,11 @@
-import {
+﻿import {
   Card,
   GameState,
   GameStatus,
   PlayerStatus,
   PlayerAction,
   Hand,
-} from '@shared/types/poker';
+} from '../../shared/types/poker';
 import { DeckEngine } from './engine/deck.engine';
 import { ShuffleEngine } from './engine/shuffle.engine';
 import { HandEvaluator } from './evaluator/hand.evaluator';

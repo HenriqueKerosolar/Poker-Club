@@ -1,4 +1,4 @@
-import { GameState, PlayerStatus } from '@shared/types/poker';
+﻿import { GameState, PlayerStatus } from '../../../shared/types/poker';
 
 /**
  * TurnEngine - Controla turnos e ordem de ações

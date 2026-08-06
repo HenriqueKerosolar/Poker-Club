@@ -1,4 +1,4 @@
-import {
+﻿import {
   WebSocketGateway,
   WebSocketServer,
   SubscribeMessage,
@@ -11,7 +11,7 @@ import { Server, Socket } from 'socket.io';
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { GameService } from '../services/game.service';
-import { PlayerAction } from '@shared/types/poker';
+import { PlayerAction } from '../../../shared/types/poker';
 
 /**
  * GameGateway - WebSocket para partidas ativas

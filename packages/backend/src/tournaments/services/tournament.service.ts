@@ -1,6 +1,6 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '@/database/prisma.service';
-import { RedisService } from '@/redis/redis.service';
+﻿import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { PrismaService } from '../../database/prisma.service';
+import { RedisService } from '../../redis/redis.service';
 
 /**
  * TournamentService - Criação, gestão e execução de torneios

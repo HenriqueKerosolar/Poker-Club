@@ -1,4 +1,4 @@
-import { GameState, PlayerStatus, Pot } from '@shared/types/poker';
+﻿import { GameState, PlayerStatus, Pot } from '../../../shared/types/poker';
 
 /**
  * PotEngine - Calcula potes principais e side pots

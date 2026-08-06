@@ -1,4 +1,4 @@
-import { Card, Rank, Suit } from '@shared/types/poker';
+﻿import { Card, Rank, Suit } from '../../../shared/types/poker';
 
 /**
  * DeckEngine - Gerencia operações com baralho

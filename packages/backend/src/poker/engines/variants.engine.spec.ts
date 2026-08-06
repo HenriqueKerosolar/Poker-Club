@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach } from '@jest/globals';
+﻿import { describe, it, expect, beforeEach } from '@jest/globals';
 import { OmahaEngine } from './omaha.engine';
 import { StudEngine } from './stud.engine';
 import { RazzEngine } from './razz.engine';
 import { HiLoEngine } from './hilo.engine';
-import { Card } from '@shared/types/poker';
+import { Card } from '../../shared/types/poker';
 
 describe('Poker Variants Engines', () => {
   let omahaEngine: OmahaEngine;

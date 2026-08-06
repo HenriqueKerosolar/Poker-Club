@@ -1,5 +1,5 @@
-import { describe, it, expect } from '@jest/globals';
-import { Card, HandRank, Rank, Suit } from '@shared/types/poker';
+﻿import { describe, it, expect } from '@jest/globals';
+import { Card, HandRank, Rank, Suit } from '../../../shared/types/poker';
 import { HandEvaluator } from './hand.evaluator';
 
 /**

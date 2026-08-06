@@ -1,8 +1,8 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '@/database/prisma.service';
-import { RedisService } from '@/redis/redis.service';
-import { TransactionType, INITIAL_BALANCE_CENTS, RECOVERY_BALANCE_CENTS, RECOVERY_COOLDOWN_HOURS } from '@shared/types/wallet';
-import { generateId } from '@shared/utils';
+﻿import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { PrismaService } from '../../database/prisma.service';
+import { RedisService } from '../../redis/redis.service';
+import { TransactionType, INITIAL_BALANCE_CENTS, RECOVERY_BALANCE_CENTS, RECOVERY_COOLDOWN_HOURS } from '../../shared/types/wallet';
+import { generateId } from '../../shared/utils';
 
 /**
  * WalletService - Gerencia saldo virtual do jogador

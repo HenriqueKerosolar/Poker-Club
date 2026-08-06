@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Card, Hand } from '@shared/types/poker';
+﻿import { Injectable, Logger } from '@nestjs/common';
+import { Card, Hand } from '../../shared/types/poker';
 import { HandEvaluator } from './hand-evaluator.engine';
 import { RazzEngine } from './razz.engine';
 

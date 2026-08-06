@@ -9,17 +9,25 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     this.client = createClient({
       url: process.env.REDIS_URL || 'redis://localhost:6379',
+      socket: {
+        reconnectStrategy: retries => (retries > 3 ? false : Math.min(retries * 500, 2000)),
+      },
     });
 
-    this.client.on('error', err => {
-      this.logger.error('Redis Client Error:', err);
+    this.client.on('error', () => {
+      // erros de conexão são tratados no connect() abaixo
     });
 
     this.client.on('connect', () => {
       this.logger.log('✅ Conectado ao Redis');
     });
 
-    await this.client.connect();
+    try {
+      await this.client.connect();
+    } catch (error) {
+      this.logger.warn(`⚠️ Redis indisponível: ${error.message}`);
+      this.logger.warn('Servidor iniciando sem Redis — configure REDIS_URL');
+    }
   }
 
   async onModuleDestroy() {

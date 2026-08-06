@@ -1,7 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { RedisService } from '@/redis/redis.service';
-import { Room, RoomPlayer, RoomConfig } from '@shared/types/game';
-import { generateId, generateInviteCode } from '@shared/utils';
+﻿import { Injectable, Logger } from '@nestjs/common';
+import { RedisService } from '../../../redis/redis.service';
+import { Room, RoomPlayer, RoomConfig } from '../../../shared/types/game';
+import { generateId, generateInviteCode } from '../../../shared/utils';
 
 /**
  * RoomService - Gerencia salas de jogo

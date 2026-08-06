@@ -1,4 +1,4 @@
-import {
+﻿import {
   WebSocketGateway,
   WebSocketServer,
   SubscribeMessage,
@@ -12,7 +12,7 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RoomService } from '../services/room.service';
 import { GameService } from '../services/game.service';
-import { Room } from '@shared/types/game';
+import { Room } from '../../../shared/types/game';
 
 /**
  * RoomGateway - WebSocket para salas de jogo

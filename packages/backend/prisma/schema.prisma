@@ -32,7 +32,7 @@ model User {
   updatedAt     DateTime  @updatedAt
 
   profile       UserProfile?
-  avatar        Avatar?
+  avatarData    Avatar?
   wallet        VirtualWallet?
   sessions      DeviceSession[]
 

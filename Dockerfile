@@ -1,58 +1,29 @@
-# Stage 1: Dependencies and Build
-FROM node:20-slim as builder
-
-WORKDIR /app
-
-# Install pnpm
-RUN npm install -g pnpm@8
-
-# Copy root package files
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-
-# Copy backend package
-COPY packages/backend ./packages/backend
-COPY packages/shared ./packages/shared
-
-# Install dependencies
-RUN pnpm install
-
-# Build backend
-WORKDIR /app/packages/backend
-RUN pnpm build
-
-# Stage 2: Runtime
+# Poker Club backend — build único e confiável
 FROM node:20-slim
 
 WORKDIR /app
 
-# Install pnpm for running
+# OpenSSL é necessário para o Prisma em imagens slim
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 RUN npm install -g pnpm@8
 
-# Copy package files
+# Arquivos do workspace
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-
-# Copy only backend
 COPY packages/backend ./packages/backend
 COPY packages/shared ./packages/shared
 
-# Install production dependencies only
-RUN pnpm install --prod && pnpm prune --prod
-
-# Copy built dist
-COPY --from=builder /app/packages/backend/dist ./packages/backend/dist
-
-# Set environment
-ENV NODE_ENV=production
-ENV PORT=3012
+# Instala apenas backend + shared (e suas dependências)
+RUN pnpm install --frozen-lockfile --filter @poker-club/backend... --filter @poker-club/shared
 
 WORKDIR /app/packages/backend
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3012/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
+# Gera o Prisma Client e compila com SWC
+RUN pnpm exec prisma generate
+RUN pnpm build
 
-# Expose port
+ENV NODE_ENV=production
+
 EXPOSE 3012
 
-# Run backend
 CMD ["node", "dist/main.js"]

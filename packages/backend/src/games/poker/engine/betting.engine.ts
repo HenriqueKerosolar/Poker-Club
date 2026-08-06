@@ -1,4 +1,4 @@
-import { GameState, PlayerAction, PlayerStatus } from '@shared/types/poker';
+﻿import { GameState, PlayerAction, PlayerStatus } from '../../../shared/types/poker';
 
 /**
  * BettingEngine - Valida e processa apostas

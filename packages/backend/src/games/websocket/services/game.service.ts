@@ -1,21 +1,21 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { RedisService } from '@/redis/redis.service';
-import { PrismaService } from '@/database/prisma.service';
+﻿import { Injectable, Logger } from '@nestjs/common';
+import { RedisService } from '../../../redis/redis.service';
+import { PrismaService } from '../../../database/prisma.service';
 import {
   GameState,
   GameStatus,
   PlayerStatus,
   PlayerAction,
   GamePlayer,
-} from '@shared/types/poker';
+} from '../../../shared/types/poker';
 import {
   PokerEngine,
   HandEvaluator,
   PotEngine,
   BettingEngine,
   TurnEngine,
-} from '@/games/poker';
-import { generateId } from '@shared/utils';
+} from '../../../games/poker';
+import { generateId } from '../../../shared/utils';
 
 /**
  * GameService - Orquestra partidas em tempo real

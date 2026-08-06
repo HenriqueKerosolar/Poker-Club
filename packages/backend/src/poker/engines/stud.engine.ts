@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Card, Hand, HandRank } from '@shared/types/poker';
+﻿import { Injectable, Logger } from '@nestjs/common';
+import { Card, Hand, HandRank } from '../../shared/types/poker';
 import { HandEvaluator } from './hand-evaluator.engine';
 
 /**
